@@ -16,8 +16,7 @@ using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 
 namespace LMP.Vue
-{
-
+{   
     /// <summary>
     /// Logique d'interaction pour MainWindow.xaml
     /// </summary>
