@@ -17,8 +17,6 @@ namespace LMP.Metier.ListItem
         public AllMusic()
             : base("All Music", imageGeometry)
         {
-            Chansons.Add(new Chanson() { Titre = "lucas" });
-            Chansons.Add(new Chanson() { Titre = "lucas1" });
         }
     }
 }

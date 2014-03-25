@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows;
 using System.Xml.Serialization;
 using LMP.Metier.ListItem;
 
@@ -21,35 +18,46 @@ namespace LMP.Metier
         {
             if (!isGenerate)
             {
-                if (File.Exists(menuFile))
+                try
                 {
-                    XmlSerializer xs = new XmlSerializer(typeof (ObservableCollection<ListElement>));
+                    XmlSerializer xs = new XmlSerializer(typeof(ObservableCollection<ListElement>));
                     using (StreamReader rd = new StreamReader(menuFile))
                     {
                         MenuList = xs.Deserialize(rd) as ObservableCollection<ListElement>;
                     }
                 }
-                else
+                catch (Exception)
                 {
                     MenuList = new ObservableCollection<ListElement>
                     {
                         new AllMusic(),
                         new PlayList("Play Liste vide")
                     };
-                    
+
                 }
+
+
                 isGenerate = true;
             }
 
         }
 
-        public static void Save()
+        public static bool Save()
         {
-            XmlSerializer xs = new XmlSerializer(typeof(ObservableCollection<ListElement>));
-            using (StreamWriter wr = new StreamWriter(menuFile))
+            try
             {
-                xs.Serialize(wr, MenuList);
+                XmlSerializer xs = new XmlSerializer(typeof(ObservableCollection<ListElement>));
+                using (StreamWriter wr = new StreamWriter(menuFile))
+                {
+                    xs.Serialize(wr, MenuList);
+                }
+                return true;
             }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
+            return false;
         }
     }
 }
