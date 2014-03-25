@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>p4n.playsound</name>
+    </assembly>
+    <members>
+        <member name="T:P4N.PlaySound">
+            <summary>
+            Предоставляет базовый функционал для одновременного воспроизведения нескольких аудиофайлов.
+            </summary>
+        </member>
+        <member name="M:P4N.PlaySound.Play(System.Uri)">
+            <summary>Начинает воспроизведение исходного аудиофайла.</summary>
+            <param name="uri">URI исходного аудиофайла.</param>
+            <returns>Индекс потока в микшере воспроизведения.</returns>
+        </member>
+        <member name="M:P4N.PlaySound.Play(System.String)">
+            <summary>Начинает воспроизведение исходного аудиофайла.</summary>
+            <param name="path">Путь к исходному аудиофайлу.</param>
+            <returns>Индекс потока в микшере воспроизведения.</returns>
+        </member>
+        <member name="M:P4N.PlaySound.PlayLooping(System.Uri)">
+            <summary>Начинает воспроизведение исходного аудиофайла в бесконечном цикле.</summary>
+            <param name="uri">URI исходного аудиофайла.</param>
+            <returns>Индекс потока в микшере воспроизведения.</returns>
+        </member>
+        <member name="M:P4N.PlaySound.PlayLooping(System.String)">
+            <summary>Начинает воспроизведение исходного аудиофайла в бесконечном цикле.</summary>
+            <param name="path">Путь к исходному аудиофайлу.</param>
+            <returns>Индекс потока в микшере воспроизведения.</returns>
+        </member>
+        <member name="M:P4N.PlaySound.PlayPermanent(System.Uri)">
+            <summary>
+            Начинает неконтролируемое воспроизведение метафайла. Используется исключительно для циклического воспроизведения, параметры цикла которого заданы в метафайле:
+            <para>&lt;ASX version=&quot;3.0&quot;&gt;</para>
+            <para>&#160;&#160;&lt;REPEAT&gt;</para>
+            <para>&#160;&#160;&#160;&#160;&lt;ENTRY&gt;</para>
+            <para>&#160;&#160;&#160;&#160;&#160;&#160;&lt;REF HREF=&quot;путь к исходному аудиофайлу&quot;/&gt;</para>
+            <para>&#160;&#160;&#160;&#160;&lt;/ENTRY&gt;</para>
+            <para>&#160;&#160;&lt;/REPEAT&gt;</para>
+            <para>&lt;/ASX&gt;</para>
+            </summary>
+            <param name="uri">URI исходного метафайла.</param>
+            <returns>Индекс потока в микшере воспроизведения.</returns>
+        </member>
+        <member name="M:P4N.PlaySound.PlayPermanent(System.String)">
+            <summary>
+            Начинает неконтролируемое воспроизведение метафайла. Используется исключительно для циклического воспроизведения, параметры цикла которого заданы в метафайле:
+            <para>&lt;ASX version=&quot;3.0&quot;&gt;</para>
+            <para>&#160;&#160;&lt;REPEAT&gt;</para>
+            <para>&#160;&#160;&#160;&#160;&lt;ENTRY&gt;</para>
+            <para>&#160;&#160;&#160;&#160;&#160;&#160;&lt;REF HREF=&quot;путь к исходному аудиофайлу&quot;/&gt;</para>
+            <para>&#160;&#160;&#160;&#160;&lt;/ENTRY&gt;</para>
+            <para>&#160;&#160;&lt;/REPEAT&gt;</para>
+            <para>&lt;/ASX&gt;</para>
+            </summary>
+            <param name="path">Путь к исходному метафайлу.</param>
+            <returns>Индекс потока в микшере воспроизведения.</returns>
+        </member>
+        <member name="M:P4N.PlaySound.Stop(System.Int32)">
+            <summary>Остановить воспроизведение потока с указанным индексом.</summary>
+            <param name="index">Индекс потока в микшере воспроизведения.</param>
+        </member>
+        <member name="M:P4N.PlaySound.Reset">
+            <summary>Остановить воспроизведение всех потоков в микшере воспроизведения.</summary>
+        </member>
+        <member name="P:P4N.PlaySound.Capacity">
+            <summary>Вместимость микшера (количество одновременно воспроизводимых потоков). По умолчанию 16.</summary>
+        </member>
+    </members>
+</doc>
