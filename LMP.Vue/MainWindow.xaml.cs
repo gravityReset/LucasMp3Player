@@ -16,7 +16,7 @@ using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 
 namespace LMP.Vue
-{   
+{
     /// <summary>
     /// Logique d'interaction pour MainWindow.xaml
     /// </summary>
@@ -24,10 +24,9 @@ namespace LMP.Vue
     {
         #region propriété et attribut
         DispatcherTimer timer;
-        public ObservableCollection<Chanson> ActualList { get; set; }
-        private int _currentTrack;
+        private Chanson _currentTrack;
 
-        public int CurrentTrack
+        public Chanson CurrentTrack
         {
             get { return _currentTrack; }
             set
@@ -44,8 +43,7 @@ namespace LMP.Vue
         public MainWindow()
         {
             Listes.Generate();
-            ActualList = new ObservableCollection<Chanson>();
-            CurrentTrack = -1;
+            CurrentTrack = null;
 
             isDragging = false;
 
@@ -62,6 +60,8 @@ namespace LMP.Vue
         {
             DataContext = Listes.MenuList;
             ActualLectureListBox.DataContext = this;
+            MediaGrid.DataContext = this;
+            
             LbxList.SelectedIndex = 0;
 
         }
@@ -96,9 +96,9 @@ namespace LMP.Vue
             this.IsEnabled = true;
         }
 
-        #endregion 
+        #endregion
 
-        #region player 
+        #region player
         private void timer_Tick(object sender, EventArgs e)
         {
             if (!isDragging)
@@ -155,15 +155,15 @@ namespace LMP.Vue
 
         private void btnPlay_Click(object sender, RoutedEventArgs e)
         {
-            if (ActualList.Count == 0 || CurrentTrack < 0)
+            if (Listes.ActualList.Count == 0 || CurrentTrack != null)
             {
                 if (LbxList.ItemsSource != null)
                 {
                     foreach (var m in MusicListView.ItemsSource as IEnumerable<Chanson>)
-                        ActualList.Add(m);
+                        Listes.ActualList.Add(m);
 
-                    CurrentTrack = MusicListView.SelectedIndex;
-                    PlayTrack(ActualList[CurrentTrack].Path);
+                    CurrentTrack = MusicListView.SelectedItem as Chanson;
+                    PlayTrack(CurrentTrack.Path);
                 }
             }
             else
@@ -174,8 +174,8 @@ namespace LMP.Vue
         {
             ME_musicPlayer.Stop();
             TimerSlider.Value = 0;
-            CurrentTrack = -1;
-            ActualList.Clear();
+            CurrentTrack = null;
+            Listes.ActualList.Clear();
         }
 
         private void btnNext_Click(object sender, RoutedEventArgs e)
@@ -193,6 +193,11 @@ namespace LMP.Vue
         {
             var elem = LbxList.SelectedItem as ListElement;
             AddNewPlayListe(elem.Chansons);
+        }
+
+        private void bntSaveAsPlayListeActual_OnClick(object sender, RoutedEventArgs e)
+        {
+            AddNewPlayListe(Listes.ActualList);
         }
 
         private async void bntRenamePlayListe_OnClick(object sender, RoutedEventArgs e)
@@ -220,57 +225,91 @@ namespace LMP.Vue
         #endregion
 
         #region double click
-        private void DoubleClickMusic(object sender, MouseButtonEventArgs e)
+       
+        private void DoubleClickMusic(object sender, RoutedEventArgs e)
         {
             var item = sender as ListBoxItem;
-            var track = item.Content as Chanson;
-            PlayTrack(track.Path);
-
-            if (!ActualList.Contains(track))
-                ActualList.Add(track);
-            CurrentTrack = ActualList.IndexOf(track);
+            var track = item.DataContext as Chanson;
+            AddMusicToActualAndPlay(track);
         }
 
         private void DoubleClickPlayList(object sender, MouseButtonEventArgs e)
         {
             var item = sender as ListBoxItem;
             var playList = item.Content as ListElement;
-            ActualList.Clear();
-            foreach (Chanson chanson in playList.Chansons)
-                ActualList.Add(chanson);
-            CurrentTrack = 0;
-            PlayTrack(ActualList[0].Path);
+            PlayPlayListe(playList);
         }
 
+        #endregion
+
+        #region click droit/Menu contextuelle
+
+        private void ContextMenuClickMusic(object sender, RoutedEventArgs e)
+        {
+            AddMusicToActualAndPlay(MusicListView.SelectedItem as Chanson);
+        }
+        private void MenuItemDeleteSong_OnClick(object sender, RoutedEventArgs e)
+        {
+            Listes.MenuList[LbxList.SelectedIndex].Chansons.Remove(MusicListView.SelectedItem as Chanson);
+        }
+        private void ContextMenuPlayPListeClick(object sender, RoutedEventArgs e)
+        {
+            PlayPlayListe(LbxList.SelectedItem as ListElement);
+        }
         #endregion
 
         #region action sur music
         private void Suivant()
         {
-            if (ActualList.Count > (CurrentTrack + 1))
+            int index;
+            if (Listes.ActualList.Count > (index = (Listes.ActualList.IndexOf(CurrentTrack) + 1)))
             {
-                CurrentTrack++;
-                PlayTrack(ActualList[CurrentTrack].Path);
+                CurrentTrack = Listes.ActualList[index];
+                PlayTrack(CurrentTrack.Path);
             }
-            else if (BoucleCheckBox.IsChecked != null && (ActualList.Count > 0 && (bool)BoucleCheckBox.IsChecked))
+            else if (BoucleCheckBox.IsChecked != null && (Listes.ActualList.Count > 0 && (bool)BoucleCheckBox.IsChecked))
             {
-                CurrentTrack = 0;
-                PlayTrack(ActualList[CurrentTrack].Path);
+                CurrentTrack = Listes.ActualList[0];
+                PlayTrack(CurrentTrack.Path);
             }
         }
 
         private void Precedent()
         {
-            if (CurrentTrack - 1 >= 0)
+            int index;
+            if ((index = (Listes.ActualList.IndexOf(CurrentTrack) - 1)) >= 0)
             {
-                CurrentTrack--;
-                PlayTrack(ActualList[CurrentTrack].Path);
+                CurrentTrack = Listes.ActualList[index];
+                PlayTrack(CurrentTrack.Path);
             }
             else if (BoucleCheckBox.IsChecked != null && (bool)BoucleCheckBox.IsChecked)
             {
-                CurrentTrack = ActualList.Count - 1;
-                PlayTrack(ActualList[CurrentTrack].Path);
+                CurrentTrack = Listes.ActualList.Last();
+                PlayTrack(CurrentTrack.Path);
             }
+        }
+
+        private void PlayPlayListe(ListElement playList)
+        {
+            Listes.ActualList.Clear();
+
+            foreach (Chanson chanson in playList.Chansons)
+                Listes.ActualList.Add(chanson);
+
+            if (Listes.ActualList.Count != 0)
+            {
+                CurrentTrack = Listes.ActualList.First();
+                PlayTrack(CurrentTrack.Path);
+            }
+        }
+
+        private void AddMusicToActualAndPlay(Chanson track)
+        {
+            PlayTrack(track.Path);
+
+            if (!Listes.ActualList.Contains(track))
+                Listes.ActualList.Add(track);
+            CurrentTrack = track;
         }
 
         private void PlayTrack(string path = "")
@@ -283,16 +322,16 @@ namespace LMP.Vue
                     TimerSlider.Value = 0;
                     ME_musicPlayer.Play();
                 }
-                else
+                else //si le fichier existe pas ou plus on le supprime
                 {
                     if (LbxList.SelectedIndex >= 0)
                     {
                         //on supprime la liste et suivnt précédent pour verifier le current track
                         var l = LbxList.SelectedItem as ListElement;
-                        l.Chansons.Remove(ActualList[CurrentTrack]);
+                        l.Chansons.Remove(CurrentTrack);
 
                     }
-                    ActualList.RemoveAt(CurrentTrack);
+                    Listes.ActualList.Remove(CurrentTrack);
                     Precedent();
                     Suivant();
                 }
@@ -334,6 +373,20 @@ namespace LMP.Vue
             Listes.MenuList.Add(playListe);
         }
 
+        private void MenuItemRemoveFromPlay_OnClick(object sender, RoutedEventArgs e)
+        {
+            var menu = sender as MenuItem;
+            var value = menu.DataContext as Chanson;
+            if (value != null)
+            {
+                if (value == CurrentTrack)
+                    Suivant();
+
+                Listes.ActualList.Remove(value);
+                OnPropertyChanged("CurrentTrack");
+            }
+        }
+
         #endregion
 
         #region propertychange interface
@@ -347,5 +400,11 @@ namespace LMP.Vue
         }
         #endregion
 
+        private void MenuItemAjoutAlaFinClick(object sender, RoutedEventArgs e)
+        {
+            var song = MusicListView.SelectedItem as Chanson;
+
+            Listes.ActualList.Add(song);
+        }
     }
 }

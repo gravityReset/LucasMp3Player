@@ -3,21 +3,37 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         xmlns:conv="clr-namespace:LMP.Vue.Converter"
+        xmlns:ls="clr-namespace:LMP.Metier;assembly=LMP.Metier"
         Title="Lucas Media Player" Height="600" Width="1000" MinHeight="200" MinWidth="300" 
         Icon="icon.png" Closing="MainWindow_OnClosing">
+
     <controls:MetroWindow.WindowCommands>
         <controls:WindowCommands>
             <Button Content="settings" Click="Settings_OnClick" />
-            <!--<Button Content="" />-->
         </controls:WindowCommands>
     </controls:MetroWindow.WindowCommands>
+
     <Window.Resources>
         <conv:IntToDateConverter x:Key="intToDateConverter"/>
         <conv:IsPlayListToVisible x:Key="PlayListToVisible"/>
         <conv:IsRechercheToVisible x:Key="RechercheToVisible"/>
-
+        <conv:IsNullToVisible x:Key="IsSelectedToVisible"/>
+        <conv:IsPlayListToBool x:Key="IsPlayListToBool"/>
+        <conv:IsInListToBoolConverter x:Key="IsInListToBoolConverter"/>
+        <ls:Listes x:Key="Lst4Listes" />
         <DataTemplate x:Key="ListBoxItemTemplate">
             <Grid>
+                <Grid.ContextMenu>
+                    <ContextMenu >
+                        <MenuItem Header="Jouer" FontWeight="Bold" Click="ContextMenuPlayPListeClick"/>
+                        <MenuItem Header="Supprimer" Visibility="{Binding RelativeSource={RelativeSource Mode=Self},Path=DataContext,
+                                                    Converter={StaticResource PlayListToVisible}}"
+                                            Click="btnDeletePlayListe_OnClick"       />
+                        <MenuItem Header="Renommer" Visibility="{Binding RelativeSource={RelativeSource Mode=Self},Path=DataContext,
+                                                    Converter={StaticResource PlayListToVisible}}"
+                                              Click="bntRenamePlayListe_OnClick"     />
+                    </ContextMenu>
+                </Grid.ContextMenu>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="40"/>
                     <ColumnDefinition Width="200"/>
@@ -32,52 +48,50 @@
             </Grid>
         </DataTemplate>
 
+
+        <Path x:Key="TrashListPath" Data="M29.946002,39.468986L29.946002,69.88798 37.341999,69.88798 37.341999,39.468986z M10.809999,39.468986L10.809999,69.88798 18.205999,69.88798 18.205999,39.468986z M0,34.218986L48.151,34.218986 48.151,75.784984 0,75.784984z M33.107861,0L43.386259,12.227032 49.300625,7.2549851 64.885984,25.794988 58.971876,30.767455 69.249006,42.99298 62.914156,48.317977 26.77301,5.323997z"
+              Fill="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=Button},Path=Foreground}" Stretch="Uniform" Width="20" Height="20" Margin="0,0,0,0" RenderTransformOrigin="0.5,0.5"/>
+        <Path x:Key="SaveListPath" Data="M8.1099597,36.94997L8.1099597,41.793968 39.213959,41.793968 39.213959,36.94997z M12.42,0.049999889L18.4,0.049999889 18.4,12.252 12.42,12.252z M0,0L7.9001866,0 7.9001866,14.64218 39.210766,14.64218 39.210766,0 47.401001,0 47.401001,47.917 0,47.917z"
+              Stretch="Uniform" Fill="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Button},Path=Foreground}" Width="20" Height="20" Margin="0,0,0,0" RenderTransformOrigin="0.5,0.5"/>
+
+
         <Path x:Key="TrashPath" Data="M29.946002,39.468986L29.946002,69.88798 37.341999,69.88798 37.341999,39.468986z M10.809999,39.468986L10.809999,69.88798 18.205999,69.88798 18.205999,39.468986z M0,34.218986L48.151,34.218986 48.151,75.784984 0,75.784984z M33.107861,0L43.386259,12.227032 49.300625,7.2549851 64.885984,25.794988 58.971876,30.767455 69.249006,42.99298 62.914156,48.317977 26.77301,5.323997z"
-              Fill="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Button},Path=Foreground}" Stretch="Uniform" Width="26" Height="26" Margin="0,0,0,0" RenderTransformOrigin="0.5,0.5"/>
+              Fill="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=Button},Path=Foreground}" Stretch="Uniform" Width="26" Height="26" Margin="0,0,0,0" RenderTransformOrigin="0.5,0.5"/>
         <Path x:Key="NewListPath"  Data="M25.053024,27.040001L32.007024,27.040001 32.007024,37.927001 42.892025,37.927001 42.892025,44.879002 32.007024,44.879002 32.007024,55.765001 25.053024,55.765001 25.053024,44.879002 14.168024,44.879002 14.168024,37.927001 25.053024,37.927001z M22.158013,5.3900852L21.795012,17.160269C21.795013,17.160269,21.325013,24.950391,12.748007,24.010376L5.3960018,23.810373 5.3960018,57.250895C5.3960018,57.990908,6.0030022,58.600916,6.748003,58.600916L44.532026,58.600916C45.274027,58.600916,45.881027,57.990908,45.881027,57.250895L45.881027,6.7401066C45.881027,6.0000954,45.274027,5.3900852,44.532026,5.3900852z M21.805013,0L44.532026,0C48.25803,0,51.280031,3.0200481,51.280031,6.7401066L51.280031,57.250895C51.280031,60.980953,48.25803,64.000999,44.532026,64.000999L6.748003,64.000999C3.0210018,64.000999,0,60.980953,0,57.250895L0,23.00036 2.6720009,20.180316 2.6750011,20.100315 16.67801,5.3900852 16.63801,5.3900852 12.895007,9.340147 16.81701,5.1900826 16.87301,5.1900826 16.99601,5.0600796 17.00801,5.0600796z" Stretch="Uniform" 
-              Fill="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Button},Path=Foreground}" Width="26" Height="26" Margin="0,0,0,0" RenderTransformOrigin="0.5,0.5"/>
+              Fill="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=Button},Path=Foreground}" Width="26" Height="26" Margin="0,0,0,0" RenderTransformOrigin="0.5,0.5"/>
         <Path x:Key="RenamePath" Data="M28.360707,24.709001L34.156,30.052878 27.491,31.461999z M21.804573,9.387001L35.635192,9.387001 30.593621,14.785474 22.158771,14.785474 21.794172,26.55598C21.794173,26.55598,21.325376,34.340182,12.747326,33.399682L5.3957787,33.199483 5.3957787,66.6419C5.3957787,67.386998,6.0025845,67.990499,6.7473412,67.990499L44.53104,67.990499C45.273136,67.990499,45.879932,67.386998,45.879931,66.6419L45.879931,26.531579 51.281,21.086177 51.281,66.6419C51.281,70.368501,48.257519,73.387002,44.53104,73.387002L6.7473412,73.387002C3.020792,73.387002,0,70.368501,0,66.6419L0,32.391881 2.6718655,29.573581 2.6744843,29.496381 16.677003,14.785474 16.637903,14.785474 12.895725,18.732677 16.817602,14.579372 16.872302,14.579372 16.997301,14.449473 17.007701,14.449473z M43.026355,5.7090011L52.444,14.399388 40.819316,27.001 40.62142,25.005898 37.518604,23.951198 37.431366,21.838895 34.335141,21.018596 33.96271,18.635791 31.399,18.307692z M49.489491,0.0016288757C49.907602,0.01820612,50.297243,0.16148186,50.600458,0.44016027L57.272148,6.5981974C58.081923,7.3442663,57.977726,8.7787967,57.035154,9.7963381L55.756496,11.185001 46.15,2.3229249 47.42996,0.93428278C48.016691,0.29831791,48.792635,-0.025998116,49.489491,0.0016288757z"
               Stretch="Uniform" Fill="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Button},Path=Foreground}" Width="26" Height="26" Margin="0,0,0,0" RenderTransformOrigin="0.5,0.5"/>
         <Path x:Key="SavePath" Data="M8.1099597,36.94997L8.1099597,41.793968 39.213959,41.793968 39.213959,36.94997z M12.42,0.049999889L18.4,0.049999889 18.4,12.252 12.42,12.252z M0,0L7.9001866,0 7.9001866,14.64218 39.210766,14.64218 39.210766,0 47.401001,0 47.401001,47.917 0,47.917z"
               Stretch="Uniform" Fill="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorLevel=1,AncestorType=Button},Path=Foreground}" Width="26" Height="26" Margin="0,0,0,0" RenderTransformOrigin="0.5,0.5"/>
+
         <Storyboard x:Key="slideDown">
-        	<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleY)" Storyboard.TargetName="MusicListView">
-        		<EasingDoubleKeyFrame KeyTime="0" Value="0"/>
-        		<EasingDoubleKeyFrame KeyTime="0:0:0.4" Value="1"/>
-        	</DoubleAnimationUsingKeyFrames>
-        	<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.Y)" Storyboard.TargetName="MusicListView">
-        		<EasingDoubleKeyFrame KeyTime="0" Value="-234"/>
-        		<EasingDoubleKeyFrame KeyTime="0:0:0.4" Value="0"/>
-        	</DoubleAnimationUsingKeyFrames>
-        </Storyboard>
-        <Storyboard x:Key="animationListBoxDroite">
-        	<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleX)" Storyboard.TargetName="ActualLectureListBox">
-        		<EasingDoubleKeyFrame KeyTime="0" Value="0"/>
-        		<EasingDoubleKeyFrame KeyTime="0:0:0.4" Value="1"/>
-        	</DoubleAnimationUsingKeyFrames>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleY)" Storyboard.TargetName="MusicListView">
+                <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.4" Value="1"/>
+            </DoubleAnimationUsingKeyFrames>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.Y)" Storyboard.TargetName="MusicListView">
+                <EasingDoubleKeyFrame KeyTime="0" Value="-234"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.4" Value="0"/>
+            </DoubleAnimationUsingKeyFrames>
         </Storyboard>
     </Window.Resources>
-	<controls:MetroWindow.Triggers>
-		<EventTrigger RoutedEvent="FrameworkElement.Loaded" SourceName="MusicListView">
-			<BeginStoryboard x:Name="slideDown_BeginStoryboard" Storyboard="{StaticResource slideDown}"/>
-		</EventTrigger>
-	</controls:MetroWindow.Triggers>
 
-
-
+    <controls:MetroWindow.Triggers>
+        <EventTrigger RoutedEvent="FrameworkElement.Loaded" SourceName="MusicListView">
+            <BeginStoryboard x:Name="slideDown_BeginStoryboard" Storyboard="{StaticResource slideDown}"/>
+        </EventTrigger>
+    </controls:MetroWindow.Triggers>
 
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" MinHeight="100"/>
             <RowDefinition Height="*" MinHeight="100"/>
-
         </Grid.RowDefinitions>
-
 
         <!--haut de page-->
         <Border Grid.Row="0" BorderThickness="0,0,0,2" 
                 BorderBrush="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}">
-            <Grid >
+            <Grid  Name="MediaGrid"  >
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="200"/>
                     <ColumnDefinition />
@@ -94,6 +108,7 @@
                         <RowDefinition/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
+
                     <Button Grid.ColumnSpan="2"  ToolTip="play"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                             Height="40"  Content="Play" Margin="0,2,2,0"  Background="WhiteSmoke"
                             FontWeight="Bold" Click="btnPlay_Click"/>
@@ -127,9 +142,10 @@
                 <!--media player-->
                 <Grid Grid.Column="1" Margin="5" Background="WhiteSmoke">
                     <Grid.ColumnDefinitions>
-
+                        <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="1"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
@@ -141,11 +157,23 @@
                                     Height="0" Width="0"
                                     Volume="{Binding Path=Value, ElementName=SliderVolume}" />
 
-                    <StackPanel Grid.Row="0">
+                    <StackPanel Grid.Row="1" DataContext="{Binding CurrentTrack}" >
                         <CheckBox Name="BoucleCheckBox" Content="en boucle" />
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <TextBlock Text="{Binding Titre}"  Margin="4" FontSize="24" FontWeight="Bold"/>
+                            <TextBlock  Margin="4" FontSize="20" VerticalAlignment="Bottom" >
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="- {0} - {1}">
+                                        <Binding Path="Album" />
+                                        <Binding Path="Artiste" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+
+                        </StackPanel>
                     </StackPanel>
 
-                    <Grid Grid.Row="1">
+                    <Grid Grid.Row="2">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
@@ -208,25 +236,25 @@
                 <StackPanel Grid.Row="1" Orientation="Horizontal" 
                             HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
 
-                    <Button Content="{StaticResource TrashPath}" Margin="1" 
+                    <Button Content="{DynamicResource TrashPath}" Margin="1" 
                             Visibility="{Binding ElementName=LbxList,Path=SelectedItem,
                             Converter={StaticResource PlayListToVisible}}"
                             ToolTip="Supprimer liste"
                             Click="btnDeletePlayListe_OnClick"/>
 
-                    <Button Content="{StaticResource RenamePath}" Margin="1"
+                    <Button Content="{DynamicResource RenamePath}" Margin="1"
                             Visibility="{Binding ElementName=LbxList,Path=SelectedItem,
                             Converter={StaticResource PlayListToVisible}}"
                             ToolTip="Renomer la play liste"
                             Click="bntRenamePlayListe_OnClick"/>
 
-                    <Button Content="{StaticResource SavePath}" Margin="1"
+                    <Button Content="{DynamicResource SavePath}" Margin="1"
                             Visibility="{Binding ElementName=LbxList,Path=SelectedItem,
                             Converter={StaticResource RechercheToVisible}}"
                             ToolTip="Enregistrer en tant que play liste"
                             Click="bntSaveAsPlayListe_OnClick"/>
 
-                    <Button Content="{StaticResource NewListPath}" Margin="1" 
+                    <Button Content="{DynamicResource NewListPath}" Margin="1" 
                             ToolTip="Ajouter une nouvelle play liste"
                             Click="btnAddList_OnClick"/>
                 </StackPanel>
@@ -240,17 +268,41 @@
             <ListView Grid.Column="2" BorderThickness="0" IsSynchronizedWithCurrentItem="True"
                       ItemsSource="{Binding Chansons}" Name="MusicListView" 
                       RenderTransformOrigin="0.5,0.5" >
-            	<ListView.RenderTransform>
-            		<TransformGroup>
-            			<ScaleTransform/>
-            			<SkewTransform/>
-            			<RotateTransform/>
-            			<TranslateTransform/>
-            		</TransformGroup>
-            	</ListView.RenderTransform>
+                <ListView.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform/>
+                        <SkewTransform/>
+                        <RotateTransform/>
+                        <TranslateTransform/>
+                    </TransformGroup>
+                </ListView.RenderTransform>
+                <ListView.Resources>
+                    <ContextMenu x:Key="LV_ContextMenu">
+
+                        <MenuItem Header="Play" FontWeight="Bold" Click="ContextMenuClickMusic"  />
+                        <MenuItem Header="Supprimer" Click="MenuItemDeleteSong_OnClick" />
+                        <MenuItem Header="Ajouter a la fin" Click="MenuItemAjoutAlaFinClick"
+                                  >
+                            <MenuItem.IsEnabled>
+                                <MultiBinding Converter="{StaticResource IsInListToBoolConverter}">
+                                    <Binding Source="{StaticResource Lst4Listes}" Path="ActualList" />
+                                    <Binding RelativeSource="{RelativeSource Mode=Self}"
+                                             Path="DataContext"/>
+                                </MultiBinding>
+                            </MenuItem.IsEnabled>
+                            
+                        </MenuItem>
+                        <MenuItem Header="Ajouter a" 
+                                  DataContext="{Binding ElementName=LbxList,Path=DataContext,Mode=OneWay}"
+                                  ItemsSource="{Binding}" DisplayMemberPath="Title">
+                            
+                        </MenuItem>
+                    </ContextMenu>
+                </ListView.Resources>
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
                         <EventSetter Event="MouseDoubleClick" Handler="DoubleClickMusic" />
+                        <Setter Property="ContextMenu" Value="{StaticResource LV_ContextMenu}" />
                     </Style>
                 </ListView.ItemContainerStyle>
                 <ListView.View>
@@ -269,38 +321,52 @@
             <Grid Grid.Column="4" >
                 <Grid.RowDefinitions>
                     <RowDefinition />
-                    <RowDefinition Height="42"/>
+                    <RowDefinition Height="36"/>
                 </Grid.RowDefinitions>
+
                 <ListBox  Name="ActualLectureListBox"
-                     ItemsSource="{Binding Path=ActualList}" 
-                     SelectedIndex="{Binding Path=CurrentTrack,Mode=OneWay}"
-                     VerticalAlignment="Top" HorizontalAlignment="Stretch" RenderTransformOrigin="0.5,0.5" 
-                      >
-                	<ListBox.RenderTransform>
-                		<TransformGroup>
-                			<ScaleTransform/>
-                			<SkewTransform/>
-                			<RotateTransform/>
-                			<TranslateTransform/>
-                		</TransformGroup>
-                	</ListBox.RenderTransform>
-                    <!--<ListBox.ItemContainerStyle>
-                    <Style>
-                        <Setter Property=""></Setter>
-                    </Style>
-                </ListBox.ItemContainerStyle>-->
+                     ItemsSource="{Binding Source={StaticResource Lst4Listes},Path=ActualList}" 
+                     SelectedItem="{Binding Path=CurrentTrack,Mode=OneWay}"
+                     VerticalAlignment="Top" HorizontalAlignment="Stretch" RenderTransformOrigin="0.5,0.5" >
+
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                            <EventSetter Event="MouseDoubleClick" Handler="DoubleClickMusic" />
+                        </Style>
+                    </ListBox.ItemContainerStyle>
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel >
+                                <StackPanel.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="Retirer de la liste" Click="MenuItemRemoveFromPlay_OnClick" />
+                                        <MenuItem Header="Vider liste" Click="btnStop_Click" />
+                                    </ContextMenu>
+                                </StackPanel.ContextMenu>
+
                                 <TextBlock Text="{Binding Titre}" FontWeight="Bold"/>
                                 <TextBlock Text="{Binding Artiste}"/>
                             </StackPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
+
+                <StackPanel Grid.Row="1" Orientation="Horizontal">
+
+                    <Button Content="{DynamicResource SaveListPath}" Margin="1"
+                            Visibility="{Binding ElementName=ActualLectureListBox,
+                                Path=SelectedItem,Converter={StaticResource IsSelectedToVisible}}"
+                            ToolTip="Enregistrer en tant que play liste"
+                            Click="bntSaveAsPlayListeActual_OnClick"/>
+
+                    <Button Content="{DynamicResource TrashListPath}" Margin="1"
+                            Visibility="{Binding ElementName=ActualLectureListBox,
+                                Path=SelectedItem,Converter={StaticResource IsSelectedToVisible}}"
+                            ToolTip="vider la liste de lecture"
+                            Click="btnStop_Click"/>
+
+                </StackPanel>
             </Grid>
         </Grid>
-
-
     </Grid>
 </controls:MetroWindow>

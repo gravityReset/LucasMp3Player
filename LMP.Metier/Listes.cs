@@ -7,15 +7,19 @@ using LMP.Metier.ListItem;
 
 namespace LMP.Metier
 {
-    public static class Listes
+    public  class Listes
     {
         private const string menuFile = "menu.xml";
         public static ObservableCollection<ListElement> MenuList { get; set; }
+
+        public static ObservableCollection<Chanson> ActualList { get; set; }
+
 
         private static bool isGenerate = false;
 
         public static void Generate()
         {
+            ActualList = new ObservableCollection<Chanson>();
             if (!isGenerate)
             {
                 try

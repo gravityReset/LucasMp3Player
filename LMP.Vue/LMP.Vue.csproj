@@ -67,6 +67,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Converter\IntToDateConverter.cs" />
+    <Compile Include="Converter\IsInListToBoolConverter.cs" />
+    <Compile Include="Converter\IsNullToVisible.cs" />
+    <Compile Include="Converter\IsPlayListToBool.cs" />
     <Compile Include="Converter\IsPlayListToVisible.cs" />
     <Compile Include="Converter\IsRechercheToVisible.cs" />
     <Compile Include="Properties\Annotations.cs" />
