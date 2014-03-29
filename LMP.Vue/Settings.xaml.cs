@@ -3,9 +3,11 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Forms;
 using LMP.Metier;
 using MahApps.Metro.Controls;
+using MahApps.Metro.Controls.Dialogs;
 using MessageBox = System.Windows.MessageBox;
 
 namespace LMP.Vue
@@ -18,11 +20,14 @@ namespace LMP.Vue
         public Settings()
         {
             InitializeComponent();
+            DataContext = UserSettings.Default;
+
         }
 
         private void Settings_OnClosing(object sender, CancelEventArgs e)
         {
-
+            UserSettings.Default.Save();
+            MessageBox.Show(this, "Certain parametre nécéssite le redémarage de l'application");
         }
 
         private void ButtonBase_OnClick(object sender, RoutedEventArgs e)

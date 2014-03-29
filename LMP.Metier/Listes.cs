@@ -1,15 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Xml.Serialization;
+using LMP.Metier.Annotations;
 using LMP.Metier.ListItem;
 
 namespace LMP.Metier
 {
-    public  class Listes
+    public class Listes
     {
         private const string menuFile = "menu.xml";
+
         public static ObservableCollection<ListElement> MenuList { get; set; }
 
         public static ObservableCollection<Chanson> ActualList { get; set; }
@@ -63,5 +69,6 @@ namespace LMP.Metier
             }
             return false;
         }
+
     }
 }

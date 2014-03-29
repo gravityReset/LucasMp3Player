@@ -72,10 +72,12 @@
     <Compile Include="Converter\IsPlayListToBool.cs" />
     <Compile Include="Converter\IsPlayListToVisible.cs" />
     <Compile Include="Converter\IsRechercheToVisible.cs" />
+    <Compile Include="Converter\MilliToSec.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Settings.xaml.cs">
       <DependentUpon>Settings.xaml</DependentUpon>
     </Compile>
+    <Compile Include="StyleSelectr\IsPlayListSelector.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -133,6 +135,7 @@
   <ItemGroup>
     <Resource Include="Play.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

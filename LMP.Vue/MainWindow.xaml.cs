@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -61,7 +62,7 @@ namespace LMP.Vue
             DataContext = Listes.MenuList;
             ActualLectureListBox.DataContext = this;
             MediaGrid.DataContext = this;
-            
+
             LbxList.SelectedIndex = 0;
 
         }
@@ -225,7 +226,7 @@ namespace LMP.Vue
         #endregion
 
         #region double click
-       
+
         private void DoubleClickMusic(object sender, RoutedEventArgs e)
         {
             var item = sender as ListBoxItem;
@@ -248,14 +249,45 @@ namespace LMP.Vue
         {
             AddMusicToActualAndPlay(MusicListView.SelectedItem as Chanson);
         }
+
         private void MenuItemDeleteSong_OnClick(object sender, RoutedEventArgs e)
         {
             Listes.MenuList[LbxList.SelectedIndex].Chansons.Remove(MusicListView.SelectedItem as Chanson);
         }
+
         private void ContextMenuPlayPListeClick(object sender, RoutedEventArgs e)
         {
             PlayPlayListe(LbxList.SelectedItem as ListElement);
         }
+
+        private void MenuItemAjoutAlaFinClick(object sender, RoutedEventArgs e)
+        {
+            var song = MusicListView.SelectedItem as Chanson;
+
+            Listes.ActualList.Add(song);
+        }
+
+        private void AddSongToList_Click_MC(object sender, RoutedEventArgs e)
+        {
+            var pl = (sender as MenuItem).DataContext as PlayList;
+            pl.AddSongs((IEnumerable)MusicListView.SelectedItems);
+        }
+
+        #endregion
+
+        #region preview command
+
+        private void PreviewBouton(object sender, RoutedEventArgs e)
+        {
+            var v = sender as ListBoxItem;
+            PlayPreview(v.DataContext as Chanson);
+        }
+
+        private void PreviewBoutonStop(object sender, ToolTipEventArgs e)
+        {
+            StopPreview();
+        }
+
         #endregion
 
         #region action sur music
@@ -310,6 +342,20 @@ namespace LMP.Vue
             if (!Listes.ActualList.Contains(track))
                 Listes.ActualList.Add(track);
             CurrentTrack = track;
+        }
+
+        private void PlayPreview(Chanson track)
+        {
+            ME_musicPreviewPlayer.Source = new Uri(track.Path);
+            ME_musicPlayer.Pause();
+            ME_musicPreviewPlayer.Play();
+        }
+
+
+        private void StopPreview()
+        {
+            ME_musicPlayer.Play();
+            ME_musicPreviewPlayer.Stop();
         }
 
         private void PlayTrack(string path = "")
@@ -400,11 +446,5 @@ namespace LMP.Vue
         }
         #endregion
 
-        private void MenuItemAjoutAlaFinClick(object sender, RoutedEventArgs e)
-        {
-            var song = MusicListView.SelectedItem as Chanson;
-
-            Listes.ActualList.Add(song);
-        }
     }
 }

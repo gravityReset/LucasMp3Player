@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
+using System.Windows.Controls;
 using LMP.Metier;
 
 namespace LMP.Vue
@@ -14,5 +9,15 @@ namespace LMP.Vue
     /// </summary>
     public partial class App : Application
     {
+        App()
+        {
+            ToolTipTimeActualisation();
+        }
+
+        private static void ToolTipTimeActualisation()
+        {
+            ToolTipService.ShowDurationProperty.OverrideMetadata(typeof (UIElement),
+                new FrameworkPropertyMetadata(UserSettings.Default.DureeMusiquePreview));
+        }
     }
 }

@@ -4,6 +4,7 @@
         xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         xmlns:conv="clr-namespace:LMP.Vue.Converter"
         xmlns:ls="clr-namespace:LMP.Metier;assembly=LMP.Metier"
+        xmlns:selector="clr-namespace:LMP.Vue.StyleSelectr"
         Title="Lucas Media Player" Height="600" Width="1000" MinHeight="200" MinWidth="300" 
         Icon="icon.png" Closing="MainWindow_OnClosing">
 
@@ -20,7 +21,9 @@
         <conv:IsNullToVisible x:Key="IsSelectedToVisible"/>
         <conv:IsPlayListToBool x:Key="IsPlayListToBool"/>
         <conv:IsInListToBoolConverter x:Key="IsInListToBoolConverter"/>
+
         <ls:Listes x:Key="Lst4Listes" />
+
         <DataTemplate x:Key="ListBoxItemTemplate">
             <Grid>
                 <Grid.ContextMenu>
@@ -75,13 +78,14 @@
             </DoubleAnimationUsingKeyFrames>
         </Storyboard>
     </Window.Resources>
-
+    <!--demarage des anim-->
     <controls:MetroWindow.Triggers>
         <EventTrigger RoutedEvent="FrameworkElement.Loaded" SourceName="MusicListView">
             <BeginStoryboard x:Name="slideDown_BeginStoryboard" Storyboard="{StaticResource slideDown}"/>
         </EventTrigger>
     </controls:MetroWindow.Triggers>
 
+    <!--grid principale-->
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" MinHeight="100"/>
@@ -97,7 +101,8 @@
                     <ColumnDefinition />
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <!--boutons-->
+
+                <!--boutons play pause etc-->
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -150,10 +155,16 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-
+                    <!--lecteur media principale-->
                     <MediaElement x:Name="ME_musicPlayer" LoadedBehavior="Manual" UnloadedBehavior="Close"
                                     MediaOpened="ME_musicPlayer_OnMediaOpened" 
                                     MediaEnded="ME_musicPlayer_OnMediaEnded" 
+                                    Height="0" Width="0"
+                                    Volume="{Binding Path=Value, ElementName=SliderVolume}" />
+
+                    <!--mdia element pour l'ecoute en preview-->
+                    <MediaElement x:Name="ME_musicPreviewPlayer" LoadedBehavior="Manual" UnloadedBehavior="Close"
+                   
                                     Height="0" Width="0"
                                     Volume="{Binding Path=Value, ElementName=SliderVolume}" />
 
@@ -189,7 +200,8 @@
                         <Slider Name="TimerSlider" Grid.Column="1"  Value="0" Margin="3" Maximum="0"
                                 MouseLeftButtonUp="SliderTimeLine_MouseLeftButtonUp"
                                 Thumb.DragStarted="SliderTimeLine_DragStarted" 
-                                Thumb.DragCompleted="SliderTimeLine_DragCompleted"/>
+                                Thumb.DragCompleted="SliderTimeLine_DragCompleted"
+                                IsMoveToPointEnabled="True"/>
 
                         <TextBlock Grid.Column="2"  Text="{Binding ElementName=TimerSlider,
                                     Path=Maximum,Converter={StaticResource intToDateConverter}
@@ -277,6 +289,7 @@
                     </TransformGroup>
                 </ListView.RenderTransform>
                 <ListView.Resources>
+                    <!--click droit-->
                     <ContextMenu x:Key="LV_ContextMenu">
 
                         <MenuItem Header="Play" FontWeight="Bold" Click="ContextMenuClickMusic"  />
@@ -290,23 +303,44 @@
                                              Path="DataContext"/>
                                 </MultiBinding>
                             </MenuItem.IsEnabled>
-                            
+
                         </MenuItem>
                         <MenuItem Header="Ajouter a" 
-                                  DataContext="{Binding ElementName=LbxList,Path=DataContext,Mode=OneWay}"
-                                  ItemsSource="{Binding}" DisplayMemberPath="Title">
-                            
+                                  ItemsSource="{Binding Source={StaticResource Lst4Listes},Path=MenuList}" 
+                                  >
+                            <MenuItem.Resources>
+                                <Style x:Key="StyleHidden" TargetType="MenuItem">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </Style>
+                                <Style x:Key="StyleShown" TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <EventSetter Event="Click" Handler="AddSongToList_Click_MC"/>
+                                </Style>
+                            </MenuItem.Resources>
+                            <MenuItem.ItemContainerStyleSelector >
+                                <selector:IsPlayListSelector ShowStyle="{StaticResource StyleShown}" 
+                                                             HidenStyle="{StaticResource StyleHidden}" />
+                            </MenuItem.ItemContainerStyleSelector>
+                            <MenuItem.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Title}"/>
+                                </DataTemplate>
+                            </MenuItem.ItemTemplate>
                         </MenuItem>
                     </ContextMenu>
                 </ListView.Resources>
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
                         <EventSetter Event="MouseDoubleClick" Handler="DoubleClickMusic" />
+                        <EventSetter Event="ToolTipOpening" Handler="PreviewBouton"/>
+                        <EventSetter Event="ToolTipClosing" Handler="PreviewBoutonStop"/>
                         <Setter Property="ContextMenu" Value="{StaticResource LV_ContextMenu}" />
+                        <Setter Property="ToolTip" Value="En écoute..."/>
                     </Style>
                 </ListView.ItemContainerStyle>
                 <ListView.View>
                     <GridView >
+
                         <GridViewColumn  Header=" " DisplayMemberBinding="{Binding NumInAlbum}" />
                         <GridViewColumn  Header="titre" DisplayMemberBinding="{Binding Titre}"/>
                         <GridViewColumn  Header="artiste" DisplayMemberBinding="{Binding Artiste}" />
@@ -315,9 +349,11 @@
                     </GridView>
                 </ListView.View>
             </ListView>
+            <!--fin centre de page-->
 
             <GridSplitter Grid.Column="3" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Stretch" Width="5"/>
 
+            <!--menu de droite (actual liste)-->
             <Grid Grid.Column="4" >
                 <Grid.RowDefinitions>
                     <RowDefinition />
@@ -350,7 +386,7 @@
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
-
+                <!--bouton en bas a droite-->
                 <StackPanel Grid.Row="1" Orientation="Horizontal">
 
                     <Button Content="{DynamicResource SaveListPath}" Margin="1"

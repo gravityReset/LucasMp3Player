@@ -1,4 +1,6 @@
-﻿using System.Windows.Media;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Windows.Media;
 using System.Xml.Serialization;
 
 namespace LMP.Metier.ListItem
@@ -17,9 +19,10 @@ namespace LMP.Metier.ListItem
 
         public PlayList() : base("", ImageGeometry) { }
 
-        public void AddSong(Chanson chanson)
+        public void AddSongs(IEnumerable chansons)
         {
-            Chansons.Add(chanson);
+            foreach (Chanson chanson in chansons)
+                Chansons.Add(chanson);
         }
 
         public void RemoveSong(Chanson chanson)
